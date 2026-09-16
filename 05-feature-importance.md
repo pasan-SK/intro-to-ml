@@ -1,0 +1,25 @@
+---
+title: "Feature Importance"
+teaching: 15
+exercises: 0
+---
+
+:::::: questions
+
+- FIXME
+
+::::::
+
+:::::: objectives
+
+- FIXME
+
+::::::
+
+Content coming soon.
+
+:::::: keypoints
+
+- FIXME
+
+::::::

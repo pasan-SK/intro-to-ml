@@ -2,93 +2,75 @@
 title: Setup
 ---
 
-Please follow the steps below and install the required software **before** the scheduled workshop.
+This workshop uses **Google Colab**, a free, browser-based notebook environment. There is
+**nothing to install** on your own machine before the workshop.
 
-<!--
-FIXME: Setup instructions live in this document. Please specify the tools and
-the data sets the Learner needs to have installed.
+## What you need
 
-## Data Sets
+- A laptop with a modern web browser (Chrome, Firefox, Edge, or Safari).
+- A Google account, used to open and run the Colab notebook. If you don't have one, you can
+  create one for free at <https://accounts.google.com/signup>.
+- Basic familiarity with Python syntax (variables, lists, dictionaries) and basic pandas
+  operations (loading a CSV, viewing a DataFrame). 
 
-FIXME: place any data you want learners to use in `episodes/data` and then use
-       a relative link ( [data zip file](data/lesson-data.zip) ) to provide a
-       link to it, replacing the example.com link.
-Download the [data zip file](https://example.com/FIXME) and unzip it to your Desktop
--->
-## RStudio Setup
+## Software
 
-We use RStudio for coding in R.
-
-[Click here and follow the instructions](https://posit.co/download/rstudio-desktop/) to install RStudio Desktop in your system.
+All the Python packages used in this workshop: `pandas`, `numpy`, `matplotlib`, `seaborn`,
+and `scikit-learn`. They come pre-installed in Google Colab, so no package installation is
+required either.
 
 ::::::::::::::::: discussion
 
-### R packages
+### Checking your Colab session works
 
-Most workshops using R will require the installation of specific packages. Make sure to check in advance with the workshop organisers what packages need to be installed. 
+Before the workshop, open a new notebook at <https://colab.research.google.com/> and run the
+following in the first cell:
 
-You can install packages from CRAN using:
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import sklearn
 
-```r
-install.packages("package_name")
+print("pandas:", pd.__version__)
+print("scikit-learn:", sklearn.__version__)
 ```
 
-If your package is in a different R repository, such as Bioconductor or GitHub, you may need the [BiocManager](https://www.bioconductor.org/install/) or [devtools](https://devtools.r-lib.org/) packages to install them. To install BiocManager:
-
-```r
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install()
-```
-
-For devtools, you can simply do:
-
-```r
-install.packages("devtools")
-```
-
-You can then install packages directly from GitHub with:
-
-```r
-devtools::install_github("username/reponame")
-```
+If this runs without error and prints version numbers, you're ready for the workshop.
 
 ::::::::::::::::::::::::::::
 
+## Workshop notebook
 
-<!--
-READ HERE FOR OS-SPECIFIC INSTRUCTIONS
+<!-- FIXME: add the "Open in Colab" link to the Master Notebook here once it's published,
+     e.g. a GitHub-hosted .ipynb with an Open in Colab badge, or a shared Google Drive link. -->
 
-Setup for different systems can be presented in dropdown menus via a `spoiler`
-tag. They will join to this discussion block, so you can give a general overview
-of the software used in this lesson here and fill out the individual operating
-systems (and potentially add more, e.g. online setup) in the solutions blocks.
--->
+[Open the workshop notebook in Google Colab](FIXME)
 
-<!--
-:::::::::::::::: spoiler
+## Data
 
-### Windows
+This workshop uses the [Breast Cancer Wisconsin (Diagnostic) dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#breast-cancer-wisconsin-diagnostic-dataset),
+which ships directly with scikit-learn. **There is no separate file to download** — it loads
+straight into the notebook with:
 
-Use PuTTY
+```python
+from sklearn.datasets import load_breast_cancer
 
-::::::::::::::::::::::::
+data = load_breast_cancer()
+```
 
-:::::::::::::::: spoiler
+We'll turn this into a pandas DataFrame together at the start of the workshop.
 
-### MacOS
+### Data citation
 
-Use Terminal.app
+This dataset is distributed under a [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+license and should be credited as:
 
-::::::::::::::::::::::::
+> Wolberg, W., Mangasarian, O., Street, N., & Street, W. (1993). Breast Cancer Wisconsin 
+> (Diagnostic) [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5DW2B.
 
+<!-- ## Cheat sheet -->
 
-:::::::::::::::: spoiler
-
-### Linux
-
-Use Terminal
-
-::::::::::::::::::::::::
--->
-
+<!-- FIXME: link the one-page scikit-learn workflow cheat sheet (StandardScaler -> fit ->
+     predict) here once it's prepared. -->
