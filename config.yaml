@@ -11,16 +11,16 @@
 carpentry: 'uom'
 
 # Alt-text description of the lesson.
-carpentry_description: 'Lesson Description' # FIXME
+carpentry_description: 'A hands-on introduction to machine learning fundamentals - from data exploration to model evaluation - using a clinical diagnostic dataset, for life scientists and clinicians new to predictive analytics.' # FIXME
 
 # Overall title for pages.
-title: 'Introduction to Machine Learning' # FIXME
+title: 'Introduction to Machine Learning for Clinical Data Analysis' # FIXME
 
 # Date the lesson was created ('YYYY-MM-DD', this is empty by default)
-created: ~ # FIXME
+created: '2026-08-18' # FIXME
 
 # Comma-separated list of keywords for the lesson. Avoid words in the title.
-keywords: 'ML, data, lesson' # FIXME
+keywords: 'ML, classification, PCA, scikit-learn' # FIXME
 
 # Life cycle stage of the lesson
 # refer to <https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html> for details
@@ -31,13 +31,13 @@ life_cycle: 'pre-alpha' # FIXME
 license: 'CC-BY 4.0'
 
 # Link to the source repository for this lesson
-source: 'https://github.com/melbournebioinformatics/workbench-template-rmd' # FIXME
+source: 'https://github.com/pasan-sk/intro-to-ml' # FIXME
 
 # Default branch of your lesson
 branch: 'main'
 
 # Who to contact if there are any issues
-contact: 'fixme@fixme.org' # FIXME
+contact: 'p.kalansooriya@unimelb.edu.au' # FIXME
 
 # Navigation ------------------------------------------------
 #
@@ -63,7 +63,11 @@ contact: 'fixme@fixme.org' # FIXME
 
 # Order of episodes in your lesson
 episodes:
-- introduction.Rmd
+- 01-introduction-and-data.Rmd
+- 02-exploratory-data-analysis.Rmd
+- 03-scaling-and-pca.Rmd
+- 04-predictive-modeling.Rmd
+- 05-feature-importance.Rmd
 
 # Information for Learners
 learners:
