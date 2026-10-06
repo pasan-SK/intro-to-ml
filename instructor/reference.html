@@ -291,7 +291,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Reference</h1>
-        <p>Last updated on 2026-09-16 |
+        <p>Last updated on 2026-10-06 |
 
         <a href="https://github.com/pasan-sk/intro-to-ml/edit/main/learners/reference.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -305,12 +305,90 @@
 
         
 <section><h2 class="section-heading" id="glossary">Glossary<a class="anchor" aria-label="anchor" href="#glossary"></a></h2>
-<hr class="half-width"><p>This is a placeholder file. Please add content here.</p>
-<!--
+<hr class="half-width"><dl><dt><strong>Feature (<code>X</code>)</strong></dt>
+<dd>
+An independent variable or predictor used as input to a model — what
+you’d normally call a measurement or covariate (e.g. tumour radius,
+texture).
+</dd>
+<dt><strong>Target (<code>y</code>)</strong></dt>
+<dd>
+The outcome a model is trained to predict (e.g. malignant vs. benign).
+</dd>
+<dt><strong>Supervised learning</strong></dt>
+<dd>
+Training a model on historical cases where the outcome (<code>y</code>)
+is already known, so it can predict that outcome for new, unseen cases.
+</dd>
+<dt><strong>Train/test split</strong></dt>
+<dd>
+Holding back a portion of the data (the test set) that the model never
+sees during training, so it can be evaluated honestly afterwards.
+</dd>
+<dt><strong>Overfitting</strong></dt>
+<dd>
+When a model learns the training data too specifically, including its
+noise, and performs well on it but poorly on new, unseen data.
+</dd>
+<dt><strong>Data leakage</strong></dt>
+<dd>
+When information from the test set influences training (e.g. fitting a
+scaler on the full dataset instead of training data only), making
+evaluation results optimistically biased.
+</dd>
+<dt><strong>Feature scaling / <code>StandardScaler</code></strong></dt>
+<dd>
+Rescaling every feature to the same footing (mean 0, comparable spread),
+so features measured in different units don’t dominate a model purely
+because of their numeric scale.
+</dd>
+<dt><strong>Principal Component Analysis (PCA)</strong></dt>
+<dd>
+A technique that compresses many correlated features into a smaller
+number of components that preserve as much of the original variation as
+possible, useful for visualising high-dimensional data.
+</dd>
+<dt><strong>Explained variance</strong></dt>
+<dd>
+The proportion of the original data’s total variation captured by a
+given principal component.
+</dd>
+<dt><strong>Decision tree</strong></dt>
+<dd>
+A model that makes a prediction through a series of yes/no splits on
+feature values (e.g. “is radius &gt; 15?”).
+</dd>
+<dt><strong>Random Forest</strong></dt>
+<dd>
+An ensemble of many decision trees, each trained on a random subset of
+the data and features, whose predictions are combined by majority vote.
+</dd>
+<dt><strong>Confusion matrix</strong></dt>
+<dd>
+A table counting the four possible outcomes of a classifier’s
+predictions against the true labels: true positives, true negatives,
+false positives, and false negatives.
+</dd>
+<dt><strong>Sensitivity</strong></dt>
+<dd>
+Of all patients who actually have the condition, the proportion the
+model correctly identified.
+</dd>
+<dt><strong>Specificity</strong></dt>
+<dd>
+Of all patients who do not have the condition, the proportion the model
+correctly cleared.
+</dd>
+<dt><strong>Feature importance</strong></dt>
+<dd>
+A score, derived from a trained model (e.g. a Random Forest), indicating
+how much each feature contributed to its predictions. Reflects
+statistical reliance, not biological causation.
+</dd>
+</dl><!--
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
- -->
-</section></div> <!-- / div.lesson-content -->
+ --></section></div> <!-- / div.lesson-content -->
     </main><!-- / main#main-content.main-content --><nav class="bottom-pagination mx-md-4" aria-label="Previous and Next Chapter Bottom"><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link" href="../instructor/index.html"><i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>Previous</a>
       <!-- content for large screens -->
@@ -343,7 +421,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors.</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a> Custom fork by <a href="https://www.melbournebioinformatics.org.au/" class="external-link">Melbourne Bioinformatics</a>.</p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/melbournebioinformatics/uom-varnish/tree/main" class="external-link">varnish (1.1.3)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/melbournebioinformatics/uom-varnish/tree/main" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -365,8 +443,8 @@ any links that you are not going to use.
   "url": "melbournebioinformatics.github.io/uom-varnish/instructor/reference.html",
   "identifier": "melbournebioinformatics.github.io/uom-varnish/instructor/reference.html",
   "dateCreated": "2026-08-18",
-  "dateModified": "2026-09-16",
-  "datePublished": "2026-09-29"
+  "dateModified": "2026-10-06",
+  "datePublished": "2026-10-06"
 }
 
   </script><script>

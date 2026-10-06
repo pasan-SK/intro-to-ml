@@ -221,12 +221,22 @@
 <div class="accordion accordion-flush" id="accordionFlushcurrent">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-headingcurrent">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsecurrent" aria-expanded="true" aria-controls="flush-collapsecurrent">
         <span class="visually-hidden">Current Chapter</span>
         <span class="current-chapter">
         3. Scaling &amp; PCA
         </span>
-      
+      </button>
     </div><!--/div.accordion-header-->
+
+    <div id="flush-collapsecurrent" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushcurrent">
+      <div class="accordion-body">
+        <ul><li><a href="#where-we-left-off">Where we left off</a></li>
+<li><a href="#the-scale-problem">The scale problem</a></li>
+<li><a href="#reducing-30-features-to-2">Reducing 30 features to 2</a></li>
+<li><a href="#visualising-the-clusters">Visualising the clusters</a></li>
+        </ul></div><!--/div.accordion-body-->
+    </div><!--/div.accordion-collapse-->
 
   </div><!--/div.accordion-item-->
 </div><!--/div.accordion-flush-->
@@ -307,13 +317,13 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Scaling &amp; PCA</h1>
-        <p>Last updated on 2026-09-16 |
+        <p>Last updated on 2026-10-06 |
 
         <a href="https://github.com/pasan-sk/intro-to-ml/edit/main/episodes/03-scaling-and-pca.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 45 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 50 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -328,7 +338,10 @@
 <div class="card-body">
 <div class="inner">
 <h3 class="card-title">Questions</h3>
-<ul><li>FIXME</li>
+<ul><li>Why does it matter that our features are measured on wildly
+different scales?</li>
+<li>How can we visualise 30 features at once?</li>
+<li>Is there really learnable structure in this data?</li>
 </ul></div>
 </div>
 </div>
@@ -336,13 +349,304 @@
 <div class="card-body">
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
-<ul><li>FIXME</li>
+<ul><li>Explain why features on different scales can mislead an
+algorithm.</li>
+<li>Apply <code>StandardScaler</code>, fitting on training data
+only.</li>
+<li>Use Principal Component Analysis (PCA) to reduce 30 features to
+2.</li>
+<li>Interpret a PCA scatterplot and the variance explained by each
+component.</li>
 </ul></div>
 </div>
 </div>
 </div>
 </div>
-<p>Content coming soon.</p>
+<section><h2 class="section-heading" id="where-we-left-off">Where we left off<a class="anchor" aria-label="anchor" href="#where-we-left-off"></a></h2>
+<hr class="half-width"><p>As before, this recreates everything from the previous episodes. If
+your Colab session is still running and you have already executed these
+setup steps, you can skip this section. Otherwise, run the following
+code to recreate the environment.</p>
+<div class="codewrapper sourceCode" id="cb1">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a>sns.set_style(<span class="st">"whitegrid"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1" aria-label="code-block-1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1" aria-label="code-block-1-10"></a>data <span class="op">=</span> load_breast_cancer()</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1" aria-label="code-block-1-11"></a>df <span class="op">=</span> pd.DataFrame(data.data, columns<span class="op">=</span>data.feature_names)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1" aria-label="code-block-1-12"></a>df[<span class="st">'diagnosis'</span>] <span class="op">=</span> data.target</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1" aria-label="code-block-1-13"></a>df[<span class="st">'diagnosis_label'</span>] <span class="op">=</span> df[<span class="st">'diagnosis'</span>].<span class="bu">map</span>({<span class="dv">0</span>: <span class="st">'Malignant'</span>, <span class="dv">1</span>: <span class="st">'Benign'</span>})</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1" aria-label="code-block-1-14"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1" aria-label="code-block-1-15"></a>X <span class="op">=</span> df[<span class="bu">list</span>(data.feature_names)]</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1" aria-label="code-block-1-16"></a>y <span class="op">=</span> df[<span class="st">'diagnosis'</span>]</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1" aria-label="code-block-1-17"></a></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1" aria-label="code-block-1-18"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1" aria-label="code-block-1-19"></a>    X, y, test_size<span class="op">=</span><span class="fl">0.3</span>, random_state<span class="op">=</span><span class="dv">42</span>, stratify<span class="op">=</span>y</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1" aria-label="code-block-1-20"></a>)</span></code></pre>
+</div>
+</section><section><h2 class="section-heading" id="the-scale-problem">The scale problem<a class="anchor" aria-label="anchor" href="#the-scale-problem"></a></h2>
+<hr class="half-width"><p>Look at the summary statistics for a few of our training
+features:</p>
+<div class="codewrapper sourceCode" id="cb2">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a>X_train.describe().T[[<span class="st">'mean'</span>, <span class="st">'std'</span>, <span class="st">'min'</span>, <span class="st">'max'</span>]].loc[</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a>    [<span class="st">'mean area'</span>, <span class="st">'mean smoothness'</span>, <span class="st">'mean radius'</span>, <span class="st">'mean symmetry'</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>]</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>                       mean         std        min        max
+mean area        650.784171  340.295183  143.50000  2010.0000
+mean smoothness    0.095789    0.013349    0.06251     0.1425
+mean radius       14.093847    3.489558    6.98100    25.7300
+mean symmetry      0.180493    0.028055    0.10600     0.3040</code></pre>
+</div>
+<p><code>mean area</code> runs into the hundreds or thousands.
+<code>mean smoothness</code> is a small decimal. These are all
+legitimate measurements, but they live on completely different numeric
+scales.</p>
+<p>This matters because many algorithms compute distances or weights
+between features. If one feature has much larger numbers than the
+others, it can end up having a bigger influence on the model, even if it
+is not actually more clinically relevant.</p>
+<p>It’s like comparing a patient’s weight in grams to their temperature
+in degrees and concluding that weight matters more because the number is
+bigger.</p>
+<div class="section level3">
+<h3 id="putting-features-on-equal-footing">Putting features on equal footing<a class="anchor" aria-label="anchor" href="#putting-features-on-equal-footing"></a></h3>
+<p><code>StandardScaler</code> rescales every feature to have mean 0 and
+comparable spread, so the algorithm judges features on genuine signal
+rather than arbitrary units.</p>
+<div class="codewrapper sourceCode" id="cb4">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1" aria-label="code-block-4-4"></a>X_train_scaled <span class="op">=</span> scaler.fit_transform(X_train)   <span class="co"># fit only on training data</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1" aria-label="code-block-4-5"></a>X_test_scaled <span class="op">=</span> scaler.transform(X_test)         <span class="co"># apply the same transform to test data</span></span></code></pre>
+</div>
+<p>We can check that the scaling worked: each feature now has a mean
+close to 0 and a standard deviation of 1.</p>
+<div class="codewrapper sourceCode" id="cb5">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" tabindex="-1" aria-label="code-block-5-1"></a>pd.DataFrame(X_train_scaled, columns<span class="op">=</span>X_train.columns).describe().T[[<span class="st">'mean'</span>, <span class="st">'std'</span>]].head()</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>                         mean       std
+mean radius     -4.039203e-16  1.001259
+mean texture     3.637515e-16  1.001259
+mean perimeter  -3.146562e-16  1.001259
+mean area        6.248491e-17  1.001259
+mean smoothness  1.673703e-16  1.001259</code></pre>
+</div>
+<div id="challenge-1-why-fit_transform-on-train-but-only-transform-on-test" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<span class="callout-header">Challenge</span>
+<div id="challenge-1-why-fit_transform-on-train-but-only-transform-on-test" class="callout-inner">
+<h3 class="callout-title">Challenge 1: Why <code>fit_transform</code> on
+train but only <code>transform</code> on test?</h3>
+<div class="callout-content">
+<p>Look carefully at the two scaling lines above. The training data gets
+<code>fit_transform()</code>, but the test data only gets
+<code>transform()</code>.</p>
+<p>Why not just call <code>fit_transform()</code> on both?</p>
+</div>
+</div>
+</div>
+<div id="accordionSolution1" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
+  <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
+</button>
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div class="accordion-body">
+<p><code>fit</code> calculates the mean and standard deviation used for
+scaling. We only do this on the training data. If we also used the test
+data, the scaler would be influenced by information that should be kept
+separate until evaluation, giving us an overly optimistic view of how
+well the model performs.</p>
+<p>So we learn the scaling from the training data only, then apply that
+exact same transformation to the test data. The test set stays genuinely
+unseen.</p>
+<p>This is called <strong>data leakage</strong>, and it’s one of the
+most common ways a real-world ML analysis quietly goes wrong.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="callout1" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<span class="callout-header">Callout</span>
+<div class="callout-inner">
+<div class="callout-content">
+<p>Not all machine learning algorithms are affected by feature scaling.
+Tree-based models, such as the Random Forest we’ll train shortly, make
+decisions using one feature at a time and generally work well without
+scaling. PCA is different. It looks for the directions with the greatest
+variation in the data, so features with larger values can have a much
+bigger influence on the results. That’s why we scale the data before
+applying PCA.</p>
+</div>
+</div>
+</div>
+</div>
+</section><section><h2 class="section-heading" id="reducing-30-features-to-2">Reducing 30 features to 2<a class="anchor" aria-label="anchor" href="#reducing-30-features-to-2"></a></h2>
+<hr class="half-width"><p>We have 30 features. That’s too many to visualise or reason about
+simultaneously, but we don’t want to throw away useful information
+either.</p>
+<p>Imagine taking a photo of a 3D object. The photo does not capture
+everything, but it still shows the main features of the object.</p>
+<p><strong>Principal Component Analysis (PCA)</strong> does something
+similar with data. It finds a simpler view of the data that keeps as
+much of the important variation as possible while reducing the number of
+dimensions.</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" tabindex="-1" aria-label="code-block-7-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1" aria-label="code-block-7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1" aria-label="code-block-7-3"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1" aria-label="code-block-7-4"></a>X_train_pca <span class="op">=</span> pca.fit_transform(X_train_scaled)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1" aria-label="code-block-7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1" aria-label="code-block-7-6"></a><span class="bu">print</span>(<span class="ss">f"Variance explained by PC1: </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>Variance explained by PC1: 45.2%</code></pre>
+</div>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" tabindex="-1" aria-label="code-block-9-1"></a><span class="bu">print</span>(<span class="ss">f"Variance explained by PC2: </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>Variance explained by PC2: 19.6%</code></pre>
+</div>
+<div class="codewrapper sourceCode" id="cb11">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" tabindex="-1" aria-label="code-block-11-1"></a><span class="bu">print</span>(<span class="ss">f"Total variance captured in 2D: </span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:.1%}</span><span class="ss">"</span>)</span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>Total variance captured in 2D: 64.8%</code></pre>
+</div>
+<div id="callout2" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<span class="callout-header">Callout</span>
+<div class="callout-inner">
+<div class="callout-content">
+<p>PCA comes with a trade-off. The new variables, <code>PC1</code> and
+<code>PC2</code>, are no longer individual features such as tumour
+radius or tumour texture. Instead, they combine information from many
+original features. This makes the data much easier to visualise, but it
+also means the axes are harder to interpret directly.</p>
+<p>We’re using PCA here as an exploratory and visualisation tool. It is
+not a mandatory step in every machine learning project, and we will
+<em>not</em> be feeding these components into our classifier later.</p>
+</div>
+</div>
+</div>
+</section><section><h2 class="section-heading" id="visualising-the-clusters">Visualising the clusters<a class="anchor" aria-label="anchor" href="#visualising-the-clusters"></a></h2>
+<hr class="half-width"><p>We’ve just compressed 30 numbers per patient down to 2. Now let’s see
+what these components tell us about the data.</p>
+<div class="codewrapper sourceCode" id="cb13">
+<h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1" aria-label="code-block-13-1"></a>pca_df <span class="op">=</span> pd.DataFrame(X_train_pca, columns<span class="op">=</span>[<span class="st">'PC1'</span>, <span class="st">'PC2'</span>])</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1" aria-label="code-block-13-2"></a>pca_df[<span class="st">'diagnosis_label'</span>] <span class="op">=</span> y_train.<span class="bu">map</span>({<span class="dv">0</span>: <span class="st">'Malignant'</span>, <span class="dv">1</span>: <span class="st">'Benign'</span>}).values</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1" aria-label="code-block-13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1" aria-label="code-block-13-4"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1" aria-label="code-block-13-5"></a>sns.scatterplot(</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1" aria-label="code-block-13-6"></a>    data<span class="op">=</span>pca_df, x<span class="op">=</span><span class="st">'PC1'</span>, y<span class="op">=</span><span class="st">'PC2'</span>, hue<span class="op">=</span><span class="st">'diagnosis_label'</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1" aria-label="code-block-13-7"></a>    palette<span class="op">=</span>{<span class="st">'Malignant'</span>: <span class="st">'#d62728'</span>, <span class="st">'Benign'</span>: <span class="st">'#2ca02c'</span>}, alpha<span class="op">=</span><span class="fl">0.7</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1" aria-label="code-block-13-8"></a>)</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1" aria-label="code-block-13-9"></a>plt.title(<span class="st">'Patients projected onto 2 Principal Components'</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1" aria-label="code-block-13-10"></a>plt.xlabel(<span class="ss">f'PC1 (</span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">0</span>]<span class="sc">:.1%}</span><span class="ss"> variance)'</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1" aria-label="code-block-13-11"></a>plt.ylabel(<span class="ss">f'PC2 (</span><span class="sc">{</span>pca<span class="sc">.</span>explained_variance_ratio_[<span class="dv">1</span>]<span class="sc">:.1%}</span><span class="ss"> variance)'</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1" aria-label="code-block-13-12"></a>plt.legend(title<span class="op">=</span><span class="st">'Diagnosis'</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1" aria-label="code-block-13-13"></a>plt.show()</span></code></pre>
+</div>
+<figure><img src="../fig/03-scaling-and-pca-rendered-unnamed-chunk-6-1.png" alt="Scatterplot of patients projected onto two principal components, with malignant cases in red clustered to one side and benign cases in green clustered to the other, with modest overlap in the middle." width="768" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>This is where PCA becomes useful. In the previous episode, no single
+pair of features clearly separated the two groups. By combining
+information from all 30 features into just two components, we can now
+see benign and malignant cases forming distinct clusters.</p>
+<p>Even before training a classifier, this suggests that the data
+contains patterns that can help distinguish between the two groups. A
+classifier’s job is to learn and formalise those patterns.</p>
+<div id="challenge-2-reading-the-overlap" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<span class="callout-header">Challenge</span>
+<div id="challenge-2-reading-the-overlap" class="callout-inner">
+<h3 class="callout-title">Challenge 2: Reading the overlap</h3>
+<div class="callout-content">
+<p>Look at the region where the red and green clusters meet.</p>
+<p>What do those points represent clinically, and what does their
+existence predict about the accuracy of any model we train on this
+data?</p>
+</div>
+</div>
+</div>
+<div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
+  <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
+</button>
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div class="accordion-body">
+<p>Some patients do not fit neatly into either group. Their tumour
+measurements look similar to both benign and malignant cases, making
+them harder to classify.</p>
+<p>This means we should not expect any model to be perfectly accurate on
+this dataset. Some mistakes are inevitable because the underlying
+measurements are not always clear-cut. That’s why, in the next episode,
+we’ll focus on <em>which kinds</em> of errors the model makes, rather
+than looking only at a single accuracy score.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="accordionInstructor1" class="accordion instructor-note accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button instructor-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInstructor1" aria-expanded="false" aria-controls="collapseInstructor1">
+  <h3 class="accordion-header" id="headingInstructor1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="edit-2"></i></div> Instructor Note </h3>
+</button>
+<div id="collapseInstructor1" class="accordion-collapse collapse" data-bs-parent="#accordionInstructor1" aria-labelledby="headingInstructor1">
+<div class="accordion-body">
+<p>The visible separation is the moment that builds trust in the
+computational process. Have to emphasize this</p>
+<p>If asked how many components one should normally keep: in practice
+you’d keep enough to explain most of the variance, not always exactly 2.
+We use 2 here specifically because it’s what we can plot.</p>
+</div>
+</div>
+</div>
+</div>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
 <i class="callout-icon" data-feather="key"></i>
@@ -350,7 +654,15 @@
 <span class="callout-header">Key Points</span>
 <div class="callout-inner">
 <div class="callout-content">
-<ul><li>FIXME</li>
+<ul><li>Features measured on very different scales can mislead distance- and
+variance-based algorithms; <code>StandardScaler</code> puts them on
+equal footing.</li>
+<li>Always <code>fit</code> the scaler on training data only, then
+<code>transform</code> the test data, to avoid data leakage.</li>
+<li>PCA compresses many features into a few components that capture the
+most variation, trading interpretability for visualisability.</li>
+<li>The PCA plot shows clear separation between malignant and benign
+patients, confirming there is structure a model can learn.</li>
 </ul></div>
 </div>
 </div>
@@ -358,10 +670,7 @@
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
-
-
-
-      </div> <!-- / div.lesson-content -->
+</section></div> <!-- / div.lesson-content -->
     </main><!-- / main#main-content.main-content --><nav class="bottom-pagination mx-md-4" aria-label="Previous and Next Chapter Bottom"><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link" href="../instructor/02-exploratory-data-analysis.html"><i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>Previous</a>
         <a class="chapter-link float-end" href="../instructor/04-predictive-modeling.html">Next<i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
@@ -399,7 +708,7 @@ any links that you are not going to use.
         <p>Materials licensed under <a href="LICENSE.html">CC-BY 4.0</a> by the authors.</p>
 
         <p>Template licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" class="external-link">CC-BY 4.0</a> by <a href="https://carpentries.org/" class="external-link">The Carpentries</a> Custom fork by <a href="https://www.melbournebioinformatics.org.au/" class="external-link">Melbourne Bioinformatics</a>.</p>
-        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.0)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/melbournebioinformatics/uom-varnish/tree/main" class="external-link">varnish (1.1.3)</a></p>
+        <p>Built with <a href="https://github.com/carpentries/sandpaper/tree/" class="external-link">sandpaper (0.21.1)</a>, <a href="https://github.com/carpentries/pegboard/tree/" class="external-link">pegboard (0.7.9)</a>, and <a href="https://github.com/melbournebioinformatics/uom-varnish/tree/main" class="external-link">varnish (1.1.3)</a></p>
 		</div>
 		</footer></div> <!-- / div.container -->
 	<div id="to-top">
@@ -421,8 +730,8 @@ any links that you are not going to use.
   "url": "melbournebioinformatics.github.io/uom-varnish/instructor/03-scaling-and-pca.html",
   "identifier": "melbournebioinformatics.github.io/uom-varnish/instructor/03-scaling-and-pca.html",
   "dateCreated": "2026-08-18",
-  "dateModified": "2026-09-16",
-  "datePublished": "2026-09-29"
+  "dateModified": "2026-10-06",
+  "datePublished": "2026-10-06"
 }
 
   </script><script>
