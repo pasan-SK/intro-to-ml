@@ -43,15 +43,15 @@ If this runs without error and prints version numbers, you're ready for the work
 
 ## Workshop notebook
 
-<!-- FIXME: add the "Open in Colab" link to the Master Notebook here once it's published,
-     e.g. a GitHub-hosted .ipynb with an Open in Colab badge, or a shared Google Drive link. -->
+[Open the workshop notebook in Google Colab](https://colab.research.google.com/drive/15TfwZDd9MNx4P8ui1_zQa8vws7eUC70v)
 
-[Open the workshop notebook in Google Colab](FIXME)
+When you open it, go to **File → Save a copy in Drive** before editing, so your
+changes don't affect the shared master copy.
 
 ## Data
 
 This workshop uses the [Breast Cancer Wisconsin (Diagnostic) dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#breast-cancer-wisconsin-diagnostic-dataset),
-which ships directly with scikit-learn. **There is no separate file to download** — it loads
+which ships directly with scikit-learn. **There is no separate file to download**. It loads
 straight into the notebook with:
 
 ```python

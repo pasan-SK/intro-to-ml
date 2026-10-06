@@ -1,7 +1,7 @@
 ---
 title: "Introduction & Loading the Data"
 teaching: 30
-exercises: 0
+exercises: 5
 ---
 
 :::::::::::::::::::::::::::::::::::::: questions
@@ -48,9 +48,8 @@ Two pieces of vocabulary we'll use for the rest of the workshop:
 
 :::::::::::::::::::::::::::::::::::::: instructor
 
-This section is meant to be a conversation, not a lecture -- ask the room how
-they'd normally test whether two patient groups differ, then contrast that with
-"predict the outcome for one new, individual patient."
+Ask the room how they'd normally test whether two patient groups differ, then contrast 
+that with "predict the outcome for one new, individual patient."
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -73,11 +72,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+sns.set_style("whitegrid")   # a clean default look for all our plots
+
 print("pandas version:", pd.__version__)
 ```
 
 ``` output
-pandas version: 3.0.5
+pandas version: 3.0.6
 ```
 
 ## Loading the data
@@ -102,27 +103,55 @@ from sklearn.datasets import load_breast_cancer
 
 data = load_breast_cancer()
 df = pd.DataFrame(data.data, columns=data.feature_names)
-df['diagnosis'] = data.target
+df['diagnosis'] = data.target                                    # 0 = malignant, 1 = benign
+df['diagnosis_label'] = df['diagnosis'].map({0: 'Malignant', 1: 'Benign'})
 
 df.head()
 ```
 
 ``` output
-   mean radius  mean texture  ...  worst fractal dimension  diagnosis
-0        17.99         10.38  ...                  0.11890          0
-1        20.57         17.77  ...                  0.08902          0
-2        19.69         21.25  ...                  0.08758          0
-3        11.42         20.38  ...                  0.17300          0
-4        20.29         14.34  ...                  0.07678          0
+   mean radius  mean texture  ...  diagnosis  diagnosis_label
+0        17.99         10.38  ...          0        Malignant
+1        20.57         17.77  ...          0        Malignant
+2        19.69         21.25  ...          0        Malignant
+3        11.42         20.38  ...          0        Malignant
+4        20.29         14.34  ...          0        Malignant
 
-[5 rows x 31 columns]
+[5 rows x 32 columns]
 ```
 
 Rows are patients, columns are features plus our target (`diagnosis`).
 
+We've also added a `diagnosis_label` column. The model only ever needs the
+numeric `diagnosis` column, but readable labels make plots and summary tables
+much easier to discuss, and we'll rely on them from the next episode onwards.
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+## Challenge 1: Features and target
+
+In the DataFrame you've just created, which columns are the features (`X`) and
+which is the target (`y`)?
+
+And in your own research, what would the equivalent of each be?
+
+:::::::::::::::::::::::: solution
+
+The 30 measurement columns (`mean radius`, `mean texture`, and so on) are the
+**features** or the inputs the model will learn from. The `diagnosis` column is
+the **target** or the outcome we're trying to predict.
+
+In your own work, the features are whatever you measured for each sample or
+patient, and the target is the outcome you'd like to predict for a new one.
+If you're used to regression modelling, features are your predictors or
+covariates, and the target is your response variable.
+
+:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
+
 :::::::::::::::::::::::::::::::::::::: instructor
 
-Check-in point: confirm everyone can see the DataFrame rendered as a table
+Check-in point: Confirm everyone can see the DataFrame rendered as a table
 before moving on to exploratory data analysis in the next episode.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::

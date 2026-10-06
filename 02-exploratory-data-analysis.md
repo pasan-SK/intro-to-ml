@@ -1,25 +1,231 @@
 ---
 title: "Exploratory Data Analysis"
 teaching: 30
-exercises: 0
+exercises: 5
 ---
 
-:::::: questions
+:::::::::::::::::::::::::::::::::::::: questions
 
-- FIXME
+- What does this dataset actually look like before we model anything?
+- Can a single measurement separate malignant from benign tumours?
+- Why do we hold back part of the data instead of training on all of it?
 
-::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::: objectives
+::::::::::::::::::::::::::::::::::::: objectives
 
-- FIXME
+- Summarise the size and class balance of the dataset.
+- Interpret a pairplot to judge whether features separate the two diagnoses.
+- Explain overfitting using the "exam paper" analogy.
+- Split the data into training and test sets with `train_test_split`.
 
-::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
 
-Content coming soon.
 
-:::::: keypoints
 
-- FIXME
 
-::::::
+
+## Where we left off
+
+This block repeats everything we set up in the previous episode, so that this episode stands 
+on its own. If your Colab session is still running and you have already executed these setup 
+steps, you can skip this section. Otherwise, run the following code to recreate the 
+environment:
+
+
+``` python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_breast_cancer
+
+sns.set_style("whitegrid")
+
+data = load_breast_cancer()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['diagnosis'] = data.target                                    # 0 = malignant, 1 = benign
+df['diagnosis_label'] = df['diagnosis'].map({0: 'Malignant', 1: 'Benign'})
+```
+
+## A first look
+
+Before trusting any model output, look at the data itself. Two questions worth
+answering immediately: how much data do we have, and how balanced are the two
+groups?
+
+
+``` python
+print(f"Patients: {df.shape[0]}, Features: {df.shape[1] - 2}")
+```
+
+``` output
+Patients: 569, Features: 30
+```
+
+``` python
+df['diagnosis_label'].value_counts()
+```
+
+``` output
+diagnosis_label
+Benign       357
+Malignant    212
+Name: count, dtype: int64
+```
+
+::::::::::::::::::::::::::::::::::::: callout
+
+This dataset is only mildly imbalanced, which is convenient for teaching. Real
+clinical datasets are often severely imbalanced (for example, a rare disease
+with 2% prevalence), and that imbalance changes how you must evaluate a model.
+We'll return to this idea when we look at accuracy in a later episode.
+
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+## Looking for structure: the pairplot
+
+A pairplot draws every selected feature against every other feature, coloured
+by diagnosis. It lets you see structure with your own eyes before asking an
+algorithm to find it.
+
+We'll use five of the 30 features here. A pairplot of all 30 would be a 30 by 30
+grid (900 panels) which is far more than anyone can usefully read.
+
+
+``` python
+eda_features = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness']
+
+g = sns.pairplot(
+    df, vars=eda_features, hue='diagnosis_label',
+    palette={'Malignant': '#d62728', 'Benign': '#2ca02c'}, diag_kind='hist'
+)
+g.figure.suptitle('Pairwise relationships between key features', y=1.02)
+plt.show()
+```
+
+<img src="fig/02-exploratory-data-analysis-rendered-unnamed-chunk-3-1.png" alt="Grid of scatterplots and histograms showing five tumour measurements plotted against each other, with malignant cases in red and benign cases in green. The two groups overlap substantially in every panel." width="1315" style="display: block; margin: auto;" />
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+## Challenge 1: Can you draw the line?
+
+Look at the pairplot above. Pick any single panel.
+
+Could you draw one straight line through that panel that puts all the malignant
+cases on one side and all the benign cases on the other?
+
+:::::::::::::::::::::::: solution
+
+No. The two groups clearly *trend* differently: malignant tumours are larger
+and more irregular on average. But in every panel there is a region where red
+and green points overlap. Any single straight line would misclassify a
+substantial number of patients.
+
+This is the reason a simple threshold rule such as "flag as malignant if radius
+> 15" is not good enough, and the reason we need a model that can combine many
+features at once.
+
+:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::: instructor
+
+Everything that follows (why we need a model, why we combine features, why PCA helps) depends on learners having seen the overlap for themselves rather than being told about it.
+
+If someone points out that a *curved* or *diagonal* boundary might do better,
+that's an excellent observation, and note that this is precisely what
+a machine learning model will construct for us.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+Although the matrix contains 900 panels, there are only 435 unique pairwise relationships because each pair is shown twice. Even then, the volume of plots is too large to interpret manually, motivating the modelling and dimensionality reduction techniques introduced in the next episode.
+
+## Splitting the data
+
+Now we separate our features from our target, and then hold back part of the
+data.
+
+
+``` python
+X = df[list(data.feature_names)]   # all 30 original features
+y = df['diagnosis']                # 0 = malignant, 1 = benign
+```
+
+### Why hold data back?
+
+Imagine a medical resident who memorised every patient in their training set. They perform perfectly on those same patients, but struggle with new ones because they memorised rather than learned generalisable patterns. This failure mode is called **overfitting**.
+
+To detect it, we reserve a portion of patients that the model never sees during training and use them as an honest final evaluation.
+
+
+``` python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+print(f"Training set: {X_train.shape[0]} patients")
+```
+
+``` output
+Training set: 398 patients
+```
+
+``` python
+print(f"Test set:     {X_test.shape[0]} patients")
+```
+
+``` output
+Test set:     171 patients
+```
+
+Three arguments worth understanding:
+
+- `test_size=0.3` holds back 30% of patients for testing. There's no single
+  correct value; 70/30 and 80/20 are both common. Too little test data makes
+  your evaluation noisy, too little training data makes the model worse.
+- `stratify=y` keeps the malignant/benign proportion the same in both sets, so
+  the test set is representative.
+- `random_state=42` fixes the random shuffle so that everyone in the room gets
+  identical splits, and so your own results are reproducible.
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+## Challenge 2: What might be going wrong?
+
+A model achieves 99% accuracy when evaluated on its training patients, but only 75% accuracy on new patients.
+
+What does this suggest about the model, and what might have caused the difference?
+
+:::::::::::::::::::::::: solution
+
+The large drop from 99% to 75% suggests that the model may be overfitting.
+
+Instead of learning patterns that generalise to new patients, the model has likely memorised characteristics of the training patients. As a result, it performs extremely well on data it has already seen but struggles when presented with unseen patients.
+
+This is why evaluating a model only on its training data can give an overly optimistic estimate of performance. A separate test set is needed to assess how well the model is likely to perform in the real world.
+
+:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::: instructor
+
+Emphasise that every evaluation number in the rest of the workshop comes from
+the test set, specifically because it was kept unseen. Learners often assume
+the split is a technicality; it's the entire basis for trusting the results.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::: keypoints
+
+- Always look at your data before modelling it.
+- In this dataset no single feature cleanly separates malignant from benign
+  cases, which is why we need a model that combines many features.
+- Overfitting is a model memorising its training data instead of learning
+  generalisable patterns.
+- `train_test_split` holds back unseen patients so that evaluation is honest;
+  `stratify` preserves class balance and `random_state` makes it reproducible.
+
+::::::::::::::::::::::::::::::::::::::::::::::::
