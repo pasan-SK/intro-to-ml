@@ -1,25 +1,239 @@
 ---
 title: "Predictive Modeling"
 teaching: 40
-exercises: 0
+exercises: 5
 ---
 
-:::::: questions
+:::::::::::::::::::::::::::::::::::::: questions
 
-- FIXME
+- How does a Random Forest actually make a decision?
+- How well does our model perform on patients it has never seen?
+- Why isn't accuracy enough in a clinical setting?
 
-::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
 
-:::::: objectives
+::::::::::::::::::::::::::::::::::::: objectives
 
-- FIXME
+- Explain a Random Forest as a committee of decision trees voting.
+- Train a classifier with `.fit()` and generate predictions with `.predict()`.
+- Read a confusion matrix and identify the two types of error.
+- Calculate and interpret sensitivity and specificity.
 
-::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
 
-Content coming soon.
+```{r setup, include=FALSE}
+library(reticulate)
 
-:::::: keypoints
+reticulate::py_require(
+  packages = c("pandas", "numpy", "matplotlib", "seaborn", "scikit-learn"),
+  python_version = ">=3.10,<3.13"
+)
+```
 
-- FIXME
+```{python mpl-backend, include=FALSE}
+import matplotlib
+matplotlib.use("Agg")
+```
 
-::::::
+## Where we left off
+
+This recreates everything from the previous episodes, including the scaled training and test 
+sets. If your Colab session is still running and you've already completed these setup steps, 
+you can skip this section. Otherwise, run the following code to recreate the environment:
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+sns.set_style("whitegrid")
+
+data = load_breast_cancer()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+df['diagnosis'] = data.target
+
+X = df[list(data.feature_names)]
+y = df['diagnosis']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+```
+
+## What a Random Forest actually is
+
+A *decision tree* makes a series of simple yes-or-no decisions. For example: "Is the mean radius greater than 15?" If yes, it asks another question, and continues until it reaches a prediction. Decision trees are easy to understand, but a single tree can become too closely tailored to the training data.
+
+A *Random Forest* combines many decision trees. Each tree is trained on a slightly different subset of the data, and they vote on the final prediction. The majority vote becomes the model's answer.
+
+Using the resident analogy from the first episode, a single decision tree is like asking one resident for an opinion. A Random Forest is like asking a group of residents and going with the majority view, which is usually more reliable than relying on just one person.
+
+::::::::::::::::::::::::::::::::::::: callout
+
+People often describe machine learning models as "black boxes", but a Random Forest is easier to understand than it might seem. It is simply a collection of many decision trees, each making a series of yes-or-no decisions.
+
+The final prediction comes from combining the votes of all those trees. The model's complexity comes from having many trees working together, not from any single step being difficult to understand.
+
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+## Training the model
+
+Training the model means letting it learn patterns from the training data. We keep the test set separate so that we can use it later to evaluate how well the model performs on unseen data.
+
+```{python}
+from sklearn.ensemble import RandomForestClassifier
+
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train_scaled, y_train)
+
+print("Model trained on", X_train_scaled.shape[0], "patients.")
+```
+
+`n_estimators=100` means our Random Forest contains 100 decision trees.
+
+And that's all it takes to train the model. Notice that training the model required very little code. In many machine learning projects, most of the effort goes into preparing, exploring, and understanding the data before training begins.
+
+::::::::::::::::::::::::::::::::::::: callout
+
+We're using the scaled data to stay consistent with the rest of our workflow. However, Random 
+Forest models do not usually depend on feature scaling, so you would get very similar results 
+if you trained the model on the original `X_train` data instead.
+
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+## Evaluating on unseen patients
+
+Now it's time to evaluate the model using the test set, which contains data the model has not 
+seen before.
+
+```{python}
+y_pred = rf_model.predict(X_test_scaled)
+```
+
+### The confusion matrix
+
+A confusion matrix shows how many predictions were correct and how many were incorrect. It breaks the results into four possible outcomes.
+
+```{python, fig.alt="Two by two confusion matrix heatmap showing counts of correctly and incorrectly classified malignant and benign test patients."}
+from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
+
+cm = confusion_matrix(y_test, y_pred, labels=[0, 1])  # 0 = Malignant, 1 = Benign
+
+disp = ConfusionMatrixDisplay.from_predictions(
+    y_test, y_pred, labels=[0, 1],
+    display_labels=['Malignant', 'Benign'], cmap='Blues'
+)
+plt.title('Confusion Matrix — Test Set')
+plt.show()
+```
+
+Looking at the results from a clinical perspective:
+
+- **Correctly identified a malignant tumour**: the model detected cancer correctly.
+- **Correctly identified a benign tumour**: the model correctly recognised a non-cancerous case.
+- **Missed a malignant tumour** (false negative): the model incorrectly classified a cancerous tumour as benign.
+- **Incorrectly identified a benign tumour as malignant** (false positive): the model flagged a non-cancerous tumour as cancerous, potentially leading to additional testing.
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+## Challenge 1: Which error is worse?
+
+In this clinical setting, which is worse? a false positive or a false
+negative? Discuss with the person next to you before reading on.
+
+:::::::::::::::::::::::: solution
+
+Many people would argue that a **false negative** is the more serious mistake in this 
+situation because it means a cancerous tumour was missed, potentially delaying treatment. 
+
+However, a **false positive** also has consequences. It can lead to unnecessary tests, additional costs, and extra stress for the patient.
+
+There is no single correct answer. The importance of each type of error depends on the 
+clinical situation and the impact of getting the prediction wrong. The key point is to think 
+about these trade-offs *deliberately* rather than relying on a model's default behaviour.
+
+:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+:::::::::::::::::::::::::::::::::::::: instructor
+
+Can do a debate here with the question.
+
+Push back gently if the room converges too fast on "false negatives are always
+worse": ask what happens to a screening programme with a very high false
+positive rate.
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+### Sensitivity and specificity
+
+Accuracy on its own does not tell the whole story. A model can achieve a high accuracy score 
+while still making mistakes on the cases that matter most.
+
+That's why we also look at measures that help us understand the types of errors the model 
+makes:
+
+```{python}
+tp, fn, fp, tn = cm[0, 0], cm[0, 1], cm[1, 0], cm[1, 1]
+
+sensitivity = tp / (tp + fn)   # Of all actual malignant cases, how many did we catch?
+specificity = tn / (tn + fp)   # Of all actual benign cases, how many did we correctly clear?
+
+print(f"Sensitivity (catching malignant cases):        {sensitivity:.1%}")
+print(f"Specificity (correctly clearing benign cases):  {specificity:.1%}")
+print()
+print(classification_report(y_test, y_pred, target_names=['Malignant', 'Benign']))
+```
+
+- **Sensitivity** — of all the patients who actually have the disease, how many
+  did we correctly catch?
+- **Specificity** — of all the patients who don't have the disease, how many did
+  we correctly clear?
+
+These are simply ways of measuring the balance between false negatives and false positives.
+
+::::::::::::::::::::::::::::::::::::: challenge
+
+## Challenge 2: The dangerously accurate model
+
+Suppose you are screening for a disease with 1% prevalence, and someone builds
+a model that simply predicts "healthy" for every single patient.
+
+What accuracy would it achieve, and what would its sensitivity be?
+
+:::::::::::::::::::::::: solution
+
+It would be **99% accurate**. It gets all 99 healthy patients right and only
+the 1 sick patient wrong.
+
+Its sensitivity, however, would be **0%**: of all the patients who actually
+have the disease, it catches none of them. The model is worthless despite an
+impressive-sounding accuracy figure.
+
+This example shows why accuracy alone can be misleading. In clinical machine learning, we also 
+need to consider the types of mistakes a model makes.
+
+:::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::: keypoints
+
+- A Random Forest is many decision trees, each trained on a random subset, that
+  vote on the final prediction.
+- `.fit()` trains on the training set; `.predict()` generates predictions for
+  unseen data.
+- A confusion matrix separates the two kinds of error: false negatives (missed
+  disease) and false positives (false alarms).
+- Sensitivity measures how many true cases you catch; specificity measures how
+  many healthy patients you correctly clear. Accuracy alone can conceal a
+  clinically dangerous model.
+
+::::::::::::::::::::::::::::::::::::::::::::::::
