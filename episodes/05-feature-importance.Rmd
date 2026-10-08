@@ -27,6 +27,7 @@ reticulate::py_require(
   packages = c("pandas", "numpy", "matplotlib", "seaborn", "scikit-learn"),
   python_version = ">=3.10,<3.13"
 )
+#reticulate::use_python('/opt/anaconda3/bin/python')
 ```
 
 ```{python mpl-backend, include=FALSE}
@@ -34,13 +35,8 @@ import matplotlib
 matplotlib.use("Agg")
 ```
 
-## Where we left off
 
-This recreates everything from the previous episodes, including the trained Random Forest model. 
-If your Colab session is still active and you've already run the setup code, you do not need to 
-run it again. Otherwise, execute the following code before continuing:
-
-```{python}
+```{python, include=FALSE}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
