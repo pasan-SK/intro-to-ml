@@ -28,6 +28,7 @@ reticulate::py_require(
   packages = c("pandas", "numpy", "matplotlib", "seaborn", "scikit-learn"),
   python_version = ">=3.10,<3.13"
 )
+#reticulate::use_python('/opt/anaconda3/bin/python')
 ```
 
 ```{python mpl-backend, include=FALSE}
@@ -35,13 +36,8 @@ import matplotlib
 matplotlib.use("Agg")
 ```
 
-## Where we left off
 
-As before, this recreates everything from the previous episodes. If your Colab 
-session is still running and you have already executed these setup steps, you 
-can skip this section. Otherwise, run the following code to recreate the environment.
-
-```{python}
+```{python, include=FALSE}
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
