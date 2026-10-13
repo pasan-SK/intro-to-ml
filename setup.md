@@ -19,6 +19,27 @@ All the Python packages used in this workshop: `pandas`, `numpy`, `matplotlib`, 
 and `scikit-learn`. They come pre-installed in Google Colab, so no package installation is
 required either.
 
+## Running the materials on your own device
+
+You also can install of the packages on your own device if you prefer. Make sure that Python is already installed by using the command:
+
+```bash
+
+python --version
+
+```
+You should be able to see which Python version you have installed. If Python is not installed, you will get an error.
+
+You can use `pip` or `conda` to install the Python packages used in this workshop using the terminal. You can use the following code if you have `pip` installed:
+
+```bash
+
+pip install pandas numpy matplotlib seaborn scikit-learn
+
+```
+
+You can read more about installing Python packages [here](https://packaging.python.org/en/latest/tutorials/installing-packages/). You can also read the instructions on installing `scikit-learn` specific to your device and preferred installing on their website [here](https://scikit-learn.org/stable/install.html).
+
 ::::::::::::::::: discussion
 
 ### Checking your Colab session works

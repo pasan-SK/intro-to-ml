@@ -25,28 +25,8 @@ exercises: 5
 
 
 
-## Where we left off
-
-This block repeats everything we set up in the previous episode, so that this episode stands 
-on its own. If your Colab session is still running and you have already executed these setup 
-steps, you can skip this section. Otherwise, run the following code to recreate the 
-environment:
 
 
-``` python
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.datasets import load_breast_cancer
-
-sns.set_style("whitegrid")
-
-data = load_breast_cancer()
-df = pd.DataFrame(data.data, columns=data.feature_names)
-df['diagnosis'] = data.target                                    # 0 = malignant, 1 = benign
-df['diagnosis_label'] = df['diagnosis'].map({0: 'Malignant', 1: 'Benign'})
-```
 
 ## A first look
 
