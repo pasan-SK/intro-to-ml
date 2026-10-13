@@ -199,6 +199,7 @@
       <div class="accordion-body">
         <ul><li><a href="#what-you-need">What you need</a></li>
 <li><a href="#software">Software</a></li>
+<li><a href="#running-the-materials-on-your-own-device">Running the materials on your own device</a></li>
 <li><a href="#workshop-notebook">Workshop notebook</a></li>
 <li><a href="#data">Data</a></li>
         </ul></div><!--/div.accordion-body-->
@@ -386,6 +387,31 @@ DataFrame).</li>
 <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code>, and
 <code>scikit-learn</code>. They come pre-installed in Google Colab, so
 no package installation is required either.</p>
+</section><section><h2 class="section-heading" id="running-the-materials-on-your-own-device">Running the materials on your own device<a class="anchor" aria-label="anchor" href="#running-the-materials-on-your-own-device"></a></h2>
+<hr class="half-width"><p>You also can install of the packages on your own device if you
+prefer. Make sure that Python is already installed by using the
+command:</p>
+<div class="codewrapper sourceCode" id="cb1">
+<h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="ex">python</span> <span class="at">--version</span></span></code></pre>
+</div>
+<p>You should be able to see which Python version you have installed. If
+Python is not installed, you will get an error.</p>
+<p>You can use <code>pip</code> or <code>conda</code> to install the
+Python packages used in this workshop using the terminal. You can use
+the following code if you have <code>pip</code> installed:</p>
+<div class="codewrapper sourceCode" id="cb2">
+<h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode bash" tabindex="0"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a><span class="ex">pip</span> install pandas numpy matplotlib seaborn scikit-learn</span></code></pre>
+</div>
+<p>You can read more about installing Python packages <a href="https://packaging.python.org/en/latest/tutorials/installing-packages/" class="external-link">here</a>.
+You can also read the instructions on installing
+<code>scikit-learn</code> specific to your device and preferred
+installing on their website <a href="https://scikit-learn.org/stable/install.html" class="external-link">here</a>.</p>
 <div id="checking-your-colab-session-works" class="callout discussion">
 <div class="callout-square">
 <i class="callout-icon" data-feather="message-circle"></i>
@@ -396,17 +422,17 @@ no package installation is required either.</p>
 <div class="callout-content">
 <p>Before the workshop, open a new notebook at <a href="https://colab.research.google.com/" class="external-link uri">https://colab.research.google.com/</a> and run the following
 in the first cell:</p>
-<div class="codewrapper sourceCode" id="cb1">
+<div class="codewrapper sourceCode" id="cb3">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" tabindex="-1" aria-label="code-block-1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1" aria-label="code-block-1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1" aria-label="code-block-1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1" aria-label="code-block-1-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1" aria-label="code-block-1-5"></a><span class="im">import</span> sklearn</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1" aria-label="code-block-1-6"></a></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1" aria-label="code-block-1-7"></a><span class="bu">print</span>(<span class="st">"pandas:"</span>, pd.__version__)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1" aria-label="code-block-1-8"></a><span class="bu">print</span>(<span class="st">"scikit-learn:"</span>, sklearn.__version__)</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" tabindex="-1" aria-label="code-block-3-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1" aria-label="code-block-3-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1" aria-label="code-block-3-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1" aria-label="code-block-3-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1" aria-label="code-block-3-5"></a><span class="im">import</span> sklearn</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1" aria-label="code-block-3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1" aria-label="code-block-3-7"></a><span class="bu">print</span>(<span class="st">"pandas:"</span>, pd.__version__)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1" aria-label="code-block-3-8"></a><span class="bu">print</span>(<span class="st">"scikit-learn:"</span>, sklearn.__version__)</span></code></pre>
 </div>
 <p>If this runs without error and prints version numbers, you’re ready
 for the workshop.</p>
@@ -423,12 +449,12 @@ before editing, so your changes don’t affect the shared master copy.</p>
 Cancer Wisconsin (Diagnostic) dataset</a>, which ships directly with
 scikit-learn. <strong>There is no separate file to download</strong>. It
 loads straight into the notebook with:</p>
-<div class="codewrapper sourceCode" id="cb2">
+<div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">PYTHON<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" tabindex="-1" aria-label="code-block-2-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1" aria-label="code-block-2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1" aria-label="code-block-2-3"></a>data <span class="op">=</span> load_breast_cancer()</span></code></pre>
+<pre class="sourceCode python" tabindex="0"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" tabindex="-1" aria-label="code-block-4-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> load_breast_cancer</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1" aria-label="code-block-4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1" aria-label="code-block-4-3"></a>data <span class="op">=</span> load_breast_cancer()</span></code></pre>
 </div>
 <p>We’ll turn this into a pandas DataFrame together at the start of the
 workshop.</p>
@@ -500,8 +526,8 @@ any links that you are not going to use.
   "url": "melbournebioinformatics.github.io/uom-varnish/index.html",
   "identifier": "melbournebioinformatics.github.io/uom-varnish/index.html",
   "dateCreated": "2026-08-18",
-  "dateModified": "2026-10-06",
-  "datePublished": "2026-10-06"
+  "dateModified": "2026-10-13",
+  "datePublished": "2026-10-13"
 }
 
   </script><script>
