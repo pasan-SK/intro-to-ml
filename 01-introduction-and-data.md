@@ -78,7 +78,7 @@ print("pandas version:", pd.__version__)
 ```
 
 ``` output
-pandas version: 3.0.6
+pandas version: 3.1.0
 ```
 
 ## Loading the data
@@ -110,12 +110,12 @@ df.head()
 ```
 
 ``` output
-   mean radius  mean texture  ...  diagnosis  diagnosis_label
-0        17.99         10.38  ...          0        Malignant
-1        20.57         17.77  ...          0        Malignant
-2        19.69         21.25  ...          0        Malignant
-3        11.42         20.38  ...          0        Malignant
-4        20.29         14.34  ...          0        Malignant
+   mean radius  mean texture  ...  diagnosis diagnosis_label
+0        17.99         10.38  ...          0       Malignant
+1        20.57         17.77  ...          0       Malignant
+2        19.69         21.25  ...          0       Malignant
+3        11.42         20.38  ...          0       Malignant
+4        20.29         14.34  ...          0       Malignant
 
 [5 rows x 32 columns]
 ```
